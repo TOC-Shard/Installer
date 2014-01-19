@@ -1,4 +1,4 @@
-; Installer for Gehn Shard.
+; Installer for TOC Shard.
 ; Makes use of the Modern UI for NSIS.
 
 ;;;;;;;;;;;;
@@ -9,22 +9,22 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 ; Installer Settings ;
 ;;;;;;;;;;;;;;;;;;;;;;
-BrandingText            "Gehn Shard"
+BrandingText            "TOC-MOUL"
 CRCCheck                on
-InstallDir              "$PROGRAMFILES\Gehn Shard"
-OutFile                 "gehn_shard.exe"
+InstallDir              "$PROGRAMFILES\TOC-Moul"
+OutFile                 "TOC-Moul.exe"
 RequestExecutionLevel   admin
 
 ;;;;;;;;;;;;;;;;;;;;
 ; Meta Information ;
 ;;;;;;;;;;;;;;;;;;;;
-Name                "Gehn Shard"
-VIAddVersionKey     "CompanyName"       "Guild of Writers"
-VIAddVersionKey     "FileDescription"   "Gehn Shard"
-VIAddVersionKey     "FileVersion"       "18"
-VIAddVersionKey     "LegalCopyright"    "Guild of Writers"
-VIAddVersionKey     "ProductName"       "Gehn Shard"
-VIProductVersion    "18.0.0.0"
+Name                "TOC-MOUL"
+VIAddVersionKey     "CompanyName"       "The Open Cave"
+VIAddVersionKey     "FileDescription"   "The Open Cave"
+VIAddVersionKey     "FileVersion"       "2.15"
+VIAddVersionKey     "LegalCopyright"    "The Open Cave"
+VIAddVersionKey     "ProductName"       "The Open Cave"
+VIProductVersion    "2.15.0.0"
 
 ;;;;;;;;;;;;;;;;;;;;;
 ; MUI Configuration ;
@@ -70,10 +70,7 @@ Function CheckIfDirIsUru
     StrCmp      $1 "" done
     FindClose   $0
     MessageBox  MB_YESNO|MB_ICONEXCLAMATION \
-        "Your install folder appears to be a previous Uru Live installation. \
-        This will work, but you will be unable to use this installation to \
-        access Cyan's MOULagain shard anymore. Are you sure you want to \
-        continue?" \
+        "$(CheckMessage)" \
         IDYES set_have_urudir
     Abort
     set_have_urudir:
@@ -95,10 +92,33 @@ FunctionEnd
 !insertmacro MUI_UNPAGE_INSTFILES
 !insertmacro MUI_UNPAGE_FINISH
 
+;;;;;;;;;;;;;;;;;;;;;;
+; Interface Settings ;
+;;;;;;;;;;;;;;;;;;;;;;
+;Show all languages, despite user's codepage
+!define MUI_LANGDLL_ALLLANGUAGES
+
 ;;;;;;;;;;;;;
 ; Languages ;
 ;;;;;;;;;;;;;
-!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "English" ;first language is the default language
+!insertmacro MUI_LANGUAGE "German"
+
+LangString CheckMessage ${LANG_ENGLISH} "Your install folder appears to be a previous Uru Live installation. \
+										This will work, but you will be unable to use this installation to \
+										access Cyan's MOULagain shard anymore. Are you sure you want to \
+										continue?"
+LangString CheckMessage ${LANG_GERMAN} "Das Installationsverzeichnis scheint eine frühere \
+										Uru Live Installation zu sein. Das funktioniert, \
+										aber Sie werden nicht mehr in der Lage sein Cyan's \
+										MOULagain Shard zu erreichen. Sind Sie sicher, \
+										dass Sie fortfahren wollen?"
+;;;;;;;;;;;;;;;;;;;;;;;
+; Installer Functions ;
+;;;;;;;;;;;;;;;;;;;;;;;
+Function .onInit
+  !insertmacro MUI_LANGDLL_DISPLAY
+FunctionEnd
 
 ;;;;;;;;;;;;
 ; Sections ;
@@ -111,15 +131,15 @@ Section "Files"
     File        "Files\vcredist_x86.exe"
     ExecWait    "$INSTDIR\vcredist_x86.exe /q /norestart"
 
-    WriteRegStr HKCU "Software\Gehn Shard" "" $INSTDIR
+    WriteRegStr HKCU "Software\The Open Cave - MOUL" "" $INSTDIR
     WriteUninstaller "$INSTDIR\Uninstall.exe"
 
-    CreateDirectory "$SMPROGRAMS\Gehn Shard"
-    CreateShortCut  "$SMPROGRAMS\Gehn Shard\Gehn Shard.lnk" "$INSTDIR\UruLauncher.exe"
-    CreateShortCut  "$SMPROGRAMS\Gehn Shard\Gehn Shard - Repair.lnk" "$INSTDIR\UruLauncher.exe" \
+    CreateDirectory "$SMPROGRAMS\The Open Cave - MOUL"
+    CreateShortCut  "$SMPROGRAMS\The Open Cave - MOUL\The Open Cave.lnk" "$INSTDIR\UruLauncher.exe"
+    CreateShortCut  "$SMPROGRAMS\The Open Cave - MOUL\Repair.lnk" "$INSTDIR\UruLauncher.exe" \
                     "/ServerIni=repair.ini /Repair"
-    CreateShortCut  "$SMPROGRAMS\Gehn Shard\Gehn User Profile.lnk" "$LOCALAPPDATA\Uru - Gehn Shard"
-    CreateShortCut  "$SMPROGRAMS\Gehn Shard\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
+    CreateShortCut  "$SMPROGRAMS\The Open Cave - MOUL\TOC User Profile.lnk" "$LOCALAPPDATA\The Open Cave"
+    CreateShortCut  "$SMPROGRAMS\The Open Cave - MOUL\Uninstall.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
 
 Section "FigureOutDataSource"
@@ -174,8 +194,15 @@ Section "Repair"
 SectionEnd
 
 Section "Uninstall"
-    RMDir /r "$SMPROGRAMS\Gehn Shard"
+    RMDir /r "$SMPROGRAMS\The Open Cave - MOUL"
     Delete "$INSTDIR\Uninstall.exe"
     RMDir /r "$INSTDIR"
-    DeleteRegKey /ifempty HKCU "Software\Gehn Shard"
+    DeleteRegKey /ifempty HKCU "Software\The Open Cave - MOUL"
 SectionEnd
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
+; Uninstaller Functions ;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+Function un.onInit
+  !insertmacro MUI_UNGETLANGUAGE
+FunctionEnd
