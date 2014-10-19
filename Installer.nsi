@@ -22,10 +22,10 @@ RequestExecutionLevel   admin
 Name                "TOC-MOUL"
 VIAddVersionKey     "CompanyName"       "The Open Cave"
 VIAddVersionKey     "FileDescription"   "The Open Cave"
-VIAddVersionKey     "FileVersion"       "2.15"
+VIAddVersionKey     "FileVersion"       "2.18"
 VIAddVersionKey     "LegalCopyright"    "The Open Cave"
 VIAddVersionKey     "ProductName"       "The Open Cave"
-VIProductVersion    "2.15.0.0"
+VIProductVersion    "2.18.0.0"
 
 ;;;;;;;;;;;;;;;;;;;;;
 ; MUI Configuration ;
@@ -49,21 +49,6 @@ Var LaunchRepair
 ;;;;;;;;;;;;;
 ; Functions ;
 ;;;;;;;;;;;;;
-
-; Inform the user if their OS is unsupported.
-Function .onInit
-  ${IfNot} ${AtLeastWinVista}
-    MessageBox MB_YESNO|MB_ICONEXCLAMATION \
-       "Windows Vista or above is required to run Gehn Shard.$\r$\n\
-        You may install the client but will be unable to run it on this OS.$\r$\n$\r$\n\
-        Do you still wish to install?" \
-        /SD IDYES IDNO do_quit
-  ${EndIf}
-  Goto done
-  do_quit:
-    Quit
-  done:
-FunctionEnd
 
 ; Tries to find the Uru Live directory in the registry.
 Function FindUruDir
@@ -129,11 +114,27 @@ LangString CheckMessage ${LANG_GERMAN} "Das Installationsverzeichnis scheint ein
 										aber Sie werden nicht mehr in der Lage sein Cyan's \
 										MOULagain Shard zu erreichen. Sind Sie sicher, \
 										dass Sie fortfahren wollen?"
+LangString OSCheckMessage ${LANG_ENGLISH} "Windows Vista or above is required to run TOC Shard.$\r$\n\
+                                           You may install the client but will be unable to run it on this OS.$\r$\n$\r$\n\
+                                           Do you still wish to install?"
+LangString OSCheckMessage ${LANG_GERMAN} "Windows Vista oder höher wird benötigt um TOC Shard zu starten.$\r$\n\
+                                          Sie können den Client installieren, aber werden ihn auf diesem Betriebssystem nicht starten können.$\r$\n$\r$\n\
+                                          Wollen Sie die Installation trotzdem fortsetzen?"
+
 ;;;;;;;;;;;;;;;;;;;;;;;
 ; Installer Functions ;
 ;;;;;;;;;;;;;;;;;;;;;;;
 Function .onInit
   !insertmacro MUI_LANGDLL_DISPLAY
+  ${IfNot} ${AtLeastWinVista}
+    MessageBox MB_YESNO|MB_ICONEXCLAMATION \
+     "$(OSCheckMessage)" \
+      /SD IDYES IDNO do_quit
+  ${EndIf}
+  Goto done
+  do_quit:
+    Quit
+  done:
 FunctionEnd
 
 ;;;;;;;;;;;;
